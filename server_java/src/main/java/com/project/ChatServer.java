@@ -121,7 +121,7 @@ public void onMessage(WebSocket conn, String message) {
             objResponse.put("value", objRequest.getString("value"));
             broadcast(objResponse.toString());
 
-            commandExecutor.main(null);
+            commandExecutor.executeCommand();
 
             // Llamar al método de DisplayMensaje
             

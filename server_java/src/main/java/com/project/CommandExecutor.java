@@ -1,8 +1,13 @@
 package com.project;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 public class CommandExecutor {
 
-    public static void main(String[] args) {
+    public void executeCommand() {
         // Directorio de trabajo basado en el directorio de inicio del usuario
         String userHome = System.getProperty("user.home");
         String workingDirectory = userHome + "/dev/rpi-rgb-led-matrix";
