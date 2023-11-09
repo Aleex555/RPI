@@ -13,7 +13,7 @@ public class CommandExecutor {
         String workingDirectory = userHome + "/dev/rpi-rgb-led-matrix";
 
         // Comando a ejecutar (personalizado según tus necesidades)
-        String command = "examples-api-use/demo -D0 --led-cols=64 --led-rows=64 --led-slowdown-gpio=4 --led-no-hardware-pulse";
+        String command = "sudo examples-api-use/demo -D0 --led-cols=64 --led-rows=64 --led-slowdown-gpio=4 --led-no-hardware-pulse";
 
         try {
             // Crear el proceso builder y configurar el directorio de trabajo
