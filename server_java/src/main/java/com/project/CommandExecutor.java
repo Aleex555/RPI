@@ -9,8 +9,8 @@ public class CommandExecutor {
 
     public void executeCommand() {
         // Directorio de trabajo basado en el directorio de inicio del usuario
-        String userHome = System.getProperty("user.home");
-        String workingDirectory = userHome + "/dev/rpi-rgb-led-matrix";
+        
+        String workingDirectory ="/home/ieti/dev/rpi-rgb-led-matrix";
 
         // Comando a ejecutar (personalizado según tus necesidades)
         String command = "sudo examples-api-use/demo -D0 --led-cols=64 --led-rows=64 --led-slowdown-gpio=4 --led-no-hardware-pulse";
