@@ -17,12 +17,12 @@ public class CommandExecutor {
 
         // Directorio de trabajo basado en el directorio de inicio del usuario
 
-        // String workingDirectory = "/home/ieti/dev/rpi-rgb-led-matrix";
-        String workingDirectory = "/home/super";
+        String workingDirectory = "/home/ieti/dev/rpi-rgb-led-matrix";
+        //String workingDirectory = "/home/super";
         // Comando a ejecutar (personalizado según tus necesidades)
 
-        //String command = "sudo examples-api-use/demo -D0 --led-cols=64 --led-rows=64 --led-slowdown-gpio=4 --led-no-hardware-pulse";
-        String command = "mkdir "+mensaje;
+        String command = "examples-api-use/scrolling-text-example -y 18 -f ~/dev/bitmap-fonts/bitmap/cherry/cherry-10-b.bdf --led-cols=64 --led-rows=64 --led-slowdown-gpio=4 --led-no-hardware-pulse "+mensaje;
+        //String command = "mkdir "+mensaje;
 
         try {
             // Crear el proceso builder y configurar el directorio de trabajo
