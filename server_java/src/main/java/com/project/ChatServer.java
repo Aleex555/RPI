@@ -106,6 +106,8 @@ public void onMessage(WebSocket conn, String message) {
             String destination = objRequest.getString("destination");
             WebSocket desti = getClientById(destination);
 
+            
+
             if (desti != null) {
                 desti.send(objResponse.toString());
             }
@@ -120,8 +122,9 @@ public void onMessage(WebSocket conn, String message) {
             objResponse.put("from", clientId);
             objResponse.put("value", objRequest.getString("value"));
             broadcast(objResponse.toString());
+            String textoenviado = objRequest.getString("value");
 
-            commandExecutor.executeCommand();
+            commandExecutor.executeCommand(textoenviado);
 
             // Llamar al método de DisplayMensaje
             

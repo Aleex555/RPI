@@ -1,19 +1,28 @@
 package com.project;
 
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class CommandExecutor {
+    
 
-    public void executeCommand() {
+    public void executeCommand(String mensaje) {
+
+        String displayText = mensaje;
+
         // Directorio de trabajo basado en el directorio de inicio del usuario
-        
-        String workingDirectory ="/home/ieti/dev/rpi-rgb-led-matrix";
 
+        // String workingDirectory = "/home/ieti/dev/rpi-rgb-led-matrix";
+        String workingDirectory = "/home/super";
         // Comando a ejecutar (personalizado según tus necesidades)
-        String command = "sudo examples-api-use/demo -D0 --led-cols=64 --led-rows=64 --led-slowdown-gpio=4 --led-no-hardware-pulse";
+
+        //String command = "sudo examples-api-use/demo -D0 --led-cols=64 --led-rows=64 --led-slowdown-gpio=4 --led-no-hardware-pulse";
+        String command = "mkdir "+mensaje;
 
         try {
             // Crear el proceso builder y configurar el directorio de trabajo
@@ -23,6 +32,15 @@ public class CommandExecutor {
             // Redirigir la salida del proceso a la consola
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
+
+            // Temporizador para interrumpir el proceso después de 5 segundos
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    process.destroy(); // Interrumpir el proceso después de 5 segundos
+                }
+            }, 5000);
 
             // Leer la salida del proceso
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -35,7 +53,10 @@ public class CommandExecutor {
 
             // Esperar a que el proceso termine
             int exitCode = process.waitFor();
-            System.out.println("Comando ejecutado con código de salida: " + exitCode);
+            System.out.println("Se ha creado la carpeta");
+
+            // Cancelar el temporizador después de la finalización del proceso
+            timer.cancel();
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
