@@ -34,7 +34,13 @@ public class CommandExecutor {
             Process process = processBuilder.start();
 
             // Temporizador para interrumpir el proceso después de 5 segundos
-            
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    process.destroy(); // Interrumpir el proceso después de 5 segundos
+                }
+            }, 5000);
 
             // Leer la salida del proceso
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -46,11 +52,12 @@ public class CommandExecutor {
             }
 
             // Esperar a que el proceso termine
-            int exitCode = process.waitFor();
+            
             System.out.println("Se ha creado la carpeta");
 
             // Cancelar el temporizador después de la finalización del proceso
-            
+            timer.cancel();
+
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
