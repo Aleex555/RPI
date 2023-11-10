@@ -39,7 +39,7 @@ public class ChatServer extends WebSocketServer {
 
         String displayIP = "";
         try {
-        displayIP = getLocalIPAddress();
+        displayIP = Main.getLocalIPAddress();
 
         } catch (Exception e) {
         e.printStackTrace();
@@ -218,28 +218,7 @@ public void onMessage(WebSocket conn, String message) {
         return null;
     }
 
-    public static String getLocalIPAddress() throws SocketException, UnknownHostException {
-        String localIp = "";
-        Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-        while (networkInterfaces.hasMoreElements()) {
-            NetworkInterface ni = networkInterfaces.nextElement();
-            Enumeration<InetAddress> inetAddresses = ni.getInetAddresses();
-            while (inetAddresses.hasMoreElements()) {
-                InetAddress ia = inetAddresses.nextElement();
-                if (!ia.isLinkLocalAddress() && !ia.isLoopbackAddress() && ia.isSiteLocalAddress()) {
-                    System.out.println(ni.getDisplayName() + ": " + ia.getHostAddress());
-                    localIp = ia.getHostAddress();
-                    // Si hi ha múltiples direccions IP, es queda amb la última
-                }
-            }
-        }
-
-        // Si no troba cap direcció IP torna la loopback
-        if (localIp.compareToIgnoreCase("") == 0) {
-            localIp = InetAddress.getLocalHost().getHostAddress();
-        }
-        return localIp;
-    }
+    
     
 }
 
