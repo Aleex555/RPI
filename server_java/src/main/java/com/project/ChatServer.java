@@ -3,7 +3,9 @@ package com.project;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
@@ -28,8 +30,17 @@ public class ChatServer extends WebSocketServer {
         System.out.println("Type 'exit' to stop and exit server.");
         setConnectionLostTimeout(0);
         setConnectionLostTimeout(100);
+
+        String displayIP = "";
+        try {
+            InetAddress ip = InetAddress.getLocalHost();
+            System.out.println("IP Address: " + ip.getHostAddress());
+            displayIP = ip.getHostAddress();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
         
-        commandExecutor.onOpen(host);
+        commandExecutor.onOpen(displayIP);
     }
 
     @Override
