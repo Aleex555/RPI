@@ -5,7 +5,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Enumeration;
+
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
@@ -20,6 +24,8 @@ public class ChatServer extends WebSocketServer {
     public ChatServer (int port) {
         super(new InetSocketAddress(port));
     }
+    
+    
 
     @Override
     public void onStart() {
@@ -33,15 +39,18 @@ public class ChatServer extends WebSocketServer {
 
         String displayIP = "";
         try {
-            InetAddress ip = InetAddress.getLocalHost();
-            System.out.println("IP Address: " + ip.getHostAddress());
-            displayIP = ip.getHostAddress();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+        displayIP = getLocalIPAddress();
+
+        } catch (Exception e) {
+        e.printStackTrace();
+    }
+        
+        
         
         commandExecutor.onOpen(displayIP);
     }
+
+    
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
@@ -208,4 +217,29 @@ public void onMessage(WebSocket conn, String message) {
         
         return null;
     }
+
+    public static String getLocalIPAddress() throws SocketException, UnknownHostException {
+        String localIp = "";
+        Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+        while (networkInterfaces.hasMoreElements()) {
+            NetworkInterface ni = networkInterfaces.nextElement();
+            Enumeration<InetAddress> inetAddresses = ni.getInetAddresses();
+            while (inetAddresses.hasMoreElements()) {
+                InetAddress ia = inetAddresses.nextElement();
+                if (!ia.isLinkLocalAddress() && !ia.isLoopbackAddress() && ia.isSiteLocalAddress()) {
+                    System.out.println(ni.getDisplayName() + ": " + ia.getHostAddress());
+                    localIp = ia.getHostAddress();
+                    // Si hi ha múltiples direccions IP, es queda amb la última
+                }
+            }
+        }
+
+        // Si no troba cap direcció IP torna la loopback
+        if (localIp.compareToIgnoreCase("") == 0) {
+            localIp = InetAddress.getLocalHost().getHostAddress();
+        }
+        return localIp;
+    }
+    
 }
+
