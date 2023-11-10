@@ -40,15 +40,6 @@ public class CommandExecutor {
             if( process.isAlive() ) process.destroy();
             process.waitFor();
 
-            // Leer la salida del proceso
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-
-            // Imprimir la salida del comando
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line);
-            }
-
      
             
             System.out.println("Se ha creado la carpeta");
