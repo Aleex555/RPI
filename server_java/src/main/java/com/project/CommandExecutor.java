@@ -12,7 +12,7 @@ public class CommandExecutor {
     
 
     public void executeCommand(String mensaje) {
-
+        
         String displayText = mensaje;
 
         // Directorio de trabajo basado en el directorio de inicio del usuario
@@ -36,9 +36,11 @@ public class CommandExecutor {
             // Temporizador para interrumpir el proceso después de 5 segundos
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
+
                 @Override
                 public void run() {
                     process.destroy(); // Interrumpir el proceso después de 5 segundos
+                   
                 }
             }, 5000);
 
@@ -52,6 +54,9 @@ public class CommandExecutor {
             }
 
             // Esperar a que el proceso termine
+            if (process.isAlive()){
+                int exitCode = process.waitFor();
+            }
             
             System.out.println("Se ha creado la carpeta");
 
