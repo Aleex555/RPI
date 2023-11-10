@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 public class CommandExecutor {
     
@@ -34,15 +35,10 @@ public class CommandExecutor {
             Process process = processBuilder.start();
 
             // Temporizador para interrumpir el proceso después de 5 segundos
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
-
-                @Override
-                public void run() {
-                    process.destroy(); // Interrumpir el proceso después de 5 segundos
-                   
-                }
-            }, 5000);
+             TimeUnit.SECONDS.sleep(5);
+            // el matem si encara no ha acabat
+            if( process.isAlive() ) process.destroy();
+            process.waitFor();
 
             // Leer la salida del proceso
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -53,15 +49,11 @@ public class CommandExecutor {
                 System.out.println(line);
             }
 
-            // Esperar a que el proceso termine
-            if (process.isAlive()){
-                int exitCode = process.waitFor();
-            }
+     
             
             System.out.println("Se ha creado la carpeta");
 
-            // Cancelar el temporizador después de la finalización del proceso
-            timer.cancel();
+           
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
