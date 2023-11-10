@@ -28,6 +28,8 @@ public class ChatServer extends WebSocketServer {
         System.out.println("Type 'exit' to stop and exit server.");
         setConnectionLostTimeout(0);
         setConnectionLostTimeout(100);
+        
+        commandExecutor.onOpen(host);
     }
 
     @Override

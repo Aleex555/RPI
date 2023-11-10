@@ -50,4 +50,41 @@ public class CommandExecutor {
             e.printStackTrace();
         }
     }
+
+    public void onOpen (String mensaje) {
+        
+        String displayText = mensaje;
+
+        // Directorio de trabajo basado en el directorio de inicio del usuario
+
+        String workingDirectory = "/home/ieti/dev/rpi-rgb-led-matrix";
+        //String workingDirectory = "/home/super";
+        // Comando a ejecutar (personalizado según tus necesidades)
+
+        String command = "examples-api-use/scrolling-text-example -y 18 -f ~/dev/bitmap-fonts/bitmap/cherry/cherry-10-b.bdf --led-cols=64 --led-rows=64 --led-slowdown-gpio=4 --led-no-hardware-pulse "+mensaje;
+        //String command = "mkdir "+mensaje;
+
+        try {
+            // Crear el proceso builder y configurar el directorio de trabajo
+            ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", command);
+            processBuilder.directory(new File(workingDirectory));
+
+            // Redirigir la salida del proceso a la consola
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+
+            // Temporizador para interrumpir el proceso después de 5 segundos
+           
+            process.waitFor();
+
+     
+            
+            System.out.println("Se ha creado la carpeta");
+
+           
+
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }
