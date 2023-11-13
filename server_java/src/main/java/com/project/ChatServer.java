@@ -54,7 +54,12 @@ public class ChatServer extends WebSocketServer {
         // Quan un client es connecta
         String clientId = getConnectionId(conn);
 
-        CommandExecutor.detenerProceso();
+        try {
+            CommandExecutor.detenerProceso();
+        } catch (Exception e) {
+            
+        }
+        
         //pruebaaaaaaaaaaaaaaaa
 
         // Saludem personalment al nou client

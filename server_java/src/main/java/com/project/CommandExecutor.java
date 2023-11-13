@@ -14,7 +14,9 @@ public class CommandExecutor {
     
 
     private static volatile boolean detenerProceso = false;
+    private boolean variable;
 
+    private static Process procesoIp;
 
 
 
@@ -81,18 +83,14 @@ public class CommandExecutor {
 
             // Redirigir la salida del proceso a la consola
             processBuilder.redirectErrorStream(true);
-            Process process = processBuilder.start();
+            procesoIp = processBuilder.start();
 
             // Temporizador para interrumpir el proceso después de 5 segundos
            
-            while (!detenerProceso && process.isAlive()) {
-                // Puedes agregar lógica adicional aquí si es necesario
-            }
-
+           
             // Si aún está vivo, detener el proceso
-            if (process.isAlive()) {
-                process.destroy();
-                process.waitFor();
+            if (variable) {
+                procesoIp.waitFor();
             }
             
 
@@ -107,7 +105,8 @@ public class CommandExecutor {
         }
     }
 
-    public static void detenerProceso() {
-        detenerProceso = true;
+    public static void detenerProceso() throws InterruptedException {
+        procesoIp.destroy();
+        procesoIp.waitFor();
     }
 }
