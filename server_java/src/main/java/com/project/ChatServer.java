@@ -167,6 +167,13 @@ public void onMessage(WebSocket conn, String message) {
 
             // Llamar al método de DisplayMensaje
             
+        }else if (type.equalsIgnoreCase("cliente_flutter")) {
+           
+            JSONObject objResponse = new JSONObject("{}");
+            objResponse.put("type", "cliente_flutter");
+            objResponse.put("value", objRequest.getString("value"));
+            String cliente_tipo = objRequest.getString("value");
+            
         }
 
     } catch (Exception e) {
@@ -200,13 +207,14 @@ public void onMessage(WebSocket conn, String message) {
     }
 
     private void sendList(WebSocket conn) {
-        JSONObject objResponse = new JSONObject("{}");
-        objResponse.put("type", "list");
-        objResponse.put("from", "server");
-        objResponse.put("list", getClients());
-        objResponse.put("clientType", connectionTypes.get(conn)); // Enviar el tipo de cliente al cliente
-        conn.send(objResponse.toString());
-    }
+    JSONObject objResponse = new JSONObject("{}");
+    objResponse.put("type", "list");
+    objResponse.put("from", "server");
+    objResponse.put("list", getClients());
+    
+
+    conn.send(objResponse.toString());
+}
 
     public String getConnectionId (WebSocket connection) {
         String name = connection.toString();
