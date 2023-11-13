@@ -54,7 +54,8 @@ public class ChatServer extends WebSocketServer {
         // Quan un client es connecta
         String clientId = getConnectionId(conn);
 
-        commandExecutor.setUserConnect(true);
+        //commandExecutor.setUserConnect(true);
+        //pruebaaaaaaaaaaaaaaaa
 
         // Saludem personalment al nou client
         JSONObject objWlc = new JSONObject("{}");
