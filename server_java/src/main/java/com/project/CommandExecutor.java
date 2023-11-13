@@ -87,8 +87,11 @@ public class CommandExecutor {
 
             // Temporizador para interrumpir el proceso después de 5 segundos
            
-            //if( userConnect == true ) process.destroy();
-            process.waitFor();
+            if( userConnect == true ){ 
+                process.destroy();
+                process.waitFor();
+            };
+            
 
      
             
