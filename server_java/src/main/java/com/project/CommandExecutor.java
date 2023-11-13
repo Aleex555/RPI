@@ -13,15 +13,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class CommandExecutor {
     
 
-    private static AtomicBoolean userConnect = new AtomicBoolean(false);
+    private static volatile boolean detenerProceso = false;
 
 
 
 
-     // Método para cambiar el estado de userConnect
-     public static void setUserConnect(boolean value) {
-        userConnect.set(value);
-    }
+    
     
     
 
@@ -88,7 +85,12 @@ public class CommandExecutor {
 
             // Temporizador para interrumpir el proceso después de 5 segundos
            
-            if (userConnect.get()) {
+            while (!detenerProceso && process.isAlive()) {
+                // Puedes agregar lógica adicional aquí si es necesario
+            }
+
+            // Si aún está vivo, detener el proceso
+            if (process.isAlive()) {
                 process.destroy();
                 process.waitFor();
             }
@@ -103,5 +105,9 @@ public class CommandExecutor {
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void detenerProceso() {
+        detenerProceso = true;
     }
 }
