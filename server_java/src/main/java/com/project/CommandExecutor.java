@@ -8,18 +8,19 @@ import java.io.InputStreamReader;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CommandExecutor {
-    private boolean userConnect = false;
+    
+
+    private static AtomicBoolean userConnect = new AtomicBoolean(false);
 
 
 
-    public boolean getUserConnect() {
-        return this.userConnect;
-    }
 
-    public void setUserConnect(boolean userConnect) {
-        this.userConnect = userConnect;
+     // Método para cambiar el estado de userConnect
+     public static void setUserConnect(boolean value) {
+        userConnect.set(value);
     }
     
     
@@ -87,10 +88,10 @@ public class CommandExecutor {
 
             // Temporizador para interrumpir el proceso después de 5 segundos
            
-            if( userConnect == true ){ 
+            if (userConnect.get()) {
                 process.destroy();
                 process.waitFor();
-            };
+            }
             
 
      
