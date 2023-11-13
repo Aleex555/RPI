@@ -10,6 +10,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
 
+import java.util.concurrent.ConcurrentHashMap;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
@@ -20,6 +21,9 @@ public class ChatServer extends WebSocketServer {
     static BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
     //private Displaymensaje displayMensaje = new Displaymensaje();
     private CommandExecutor commandExecutor = new CommandExecutor();
+
+    private ConcurrentHashMap<WebSocket, String> connectionTypes = new ConcurrentHashMap<>();
+
 
     public ChatServer (int port) {
         super(new InetSocketAddress(port));
@@ -59,6 +63,11 @@ public class ChatServer extends WebSocketServer {
         } catch (Exception e) {
             
         }
+
+        String clientType = handshake.getResourceDescriptor();
+
+        // Asignar el tipo de cliente a la conexión
+        connectionTypes.put(conn, clientType);
         
         //pruebaaaaaaaaaaaaaaaa
 
@@ -111,6 +120,9 @@ public class ChatServer extends WebSocketServer {
 
 public void onMessage(WebSocket conn, String message) {
     // Quan arriba un missatge
+
+    
+    String clientType = connectionTypes.get(conn);
     String clientId = getConnectionId(conn);
     try {
         JSONObject objRequest = new JSONObject(message);
@@ -118,7 +130,7 @@ public void onMessage(WebSocket conn, String message) {
 
         if (type.equalsIgnoreCase("list")) {
             // El client demana la llista de tots els clients
-            System.out.println("Client '" + clientId + "'' requests list of clients");
+            System.out.println("Client '" + clientId + "' with type '" + clientType + "' requests list of clients");
             sendList(conn);
 
         } else if (type.equalsIgnoreCase("private")) {
@@ -187,12 +199,13 @@ public void onMessage(WebSocket conn, String message) {
         }  
     }
 
-    public void sendList (WebSocket conn) {
+    private void sendList(WebSocket conn) {
         JSONObject objResponse = new JSONObject("{}");
         objResponse.put("type", "list");
         objResponse.put("from", "server");
         objResponse.put("list", getClients());
-        conn.send(objResponse.toString()); 
+        objResponse.put("clientType", connectionTypes.get(conn)); // Enviar el tipo de cliente al cliente
+        conn.send(objResponse.toString());
     }
 
     public String getConnectionId (WebSocket connection) {
