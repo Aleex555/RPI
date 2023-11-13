@@ -197,7 +197,7 @@ public void onMessage(WebSocket conn, String message) {
 
     public String getConnectionId (WebSocket connection) {
         String name = connection.toString();
-        return name.replaceAll("org.java_websocket.WebSocketImpl@", "").substring(0, 3);
+        return name.replaceAll("org.java_websocket.WebSocketImpl@", "");
     }
 
     public String[] getClients () {
