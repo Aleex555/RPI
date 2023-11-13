@@ -10,6 +10,18 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 public class CommandExecutor {
+    private boolean userConnect = false;
+
+
+
+    public boolean getUserConnect() {
+        return this.userConnect;
+    }
+
+    public void setUserConnect(boolean userConnect) {
+        this.userConnect = userConnect;
+    }
+    
     
 
     public void executeCommand(String mensaje) {
@@ -61,7 +73,7 @@ public class CommandExecutor {
         //String workingDirectory = "/home/super";
         // Comando a ejecutar (personalizado según tus necesidades)
 
-        String command = "examples-api-use/scrolling-text-example -y 18 -f ~/dev/bitmap-fonts/bitmap/cherry/cherry-10-b.bdf --led-cols=64 --led-rows=64 --led-slowdown-gpio=4 --led-no-hardware-pulse "+mensaje;
+        String command = "examples-api-use/scrolling-text-example -y 18 -f ~/dev/bitmap-fonts/bitmap/cherry/cherry-10-b.bdf --led-cols=64 --led-rows=64 --led-slowdown-gpio=4 --led-no-hardware-pulse "+displayText;
         //String command = "mkdir "+mensaje;
 
         try {
@@ -75,6 +87,7 @@ public class CommandExecutor {
 
             // Temporizador para interrumpir el proceso después de 5 segundos
            
+            if( userConnect == true ) process.destroy();
             process.waitFor();
 
      

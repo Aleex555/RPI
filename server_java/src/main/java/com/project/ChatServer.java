@@ -39,16 +39,13 @@ public class ChatServer extends WebSocketServer {
 
         String displayIP = "";
         try {
-        displayIP = Main.getLocalIPAddress();
-
+            displayIP = Main.getLocalIPAddress();
         } catch (Exception e) {
         e.printStackTrace();
     }
-        
-        
-        
         commandExecutor.onOpen(displayIP);
     }
+
 
     
 
@@ -56,6 +53,8 @@ public class ChatServer extends WebSocketServer {
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
         // Quan un client es connecta
         String clientId = getConnectionId(conn);
+
+        commandExecutor.setUserConnect(true);
 
         // Saludem personalment al nou client
         JSONObject objWlc = new JSONObject("{}");
