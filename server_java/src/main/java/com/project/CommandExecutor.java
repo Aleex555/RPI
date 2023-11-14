@@ -19,7 +19,13 @@ public class CommandExecutor {
     private static Process procesoIp;
 
 
+    
 
+    public boolean isVariable() {
+        return this.variable;
+    }
+
+    
     
     
     

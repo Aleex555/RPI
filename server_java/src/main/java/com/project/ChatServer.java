@@ -130,7 +130,14 @@ public void onMessage(WebSocket conn, String message) {
         JSONObject objRequest = new JSONObject(message);
         String type = objRequest.getString("type");
 
-        if (type.equalsIgnoreCase("list")) {
+        if (type.equalsIgnoreCase("registro")) {
+            // El client demana la llista de tots els clients
+             JSONObject objResponse = new JSONObject("{}");
+            objResponse.put("type", "ok");
+            conn.send(objResponse.toString());
+            System.out.println("Client '" + clientId + "'' se ha unido con credenciales");
+
+        }else if (type.equalsIgnoreCase("list")) {
             // El client demana la llista de tots els clients
             System.out.println("Client '" + clientId + "' with type '" + clientType + "' requests list of clients");
             sendList(conn);
