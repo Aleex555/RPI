@@ -178,13 +178,6 @@ public void onMessage(WebSocket conn, String message) {
 
             // Llamar al método de DisplayMensaje
             
-        }else if (type.equalsIgnoreCase("cliente_flutter")) {
-           
-            JSONObject objResponse = new JSONObject("{}");
-            objResponse.put("type", "cliente_flutter");
-            objResponse.put("value", objRequest.getString("value"));
-            String cliente_tipo = objRequest.getString("value");
-            
         }
         /*
         else if (type.equalsIgnoreCase("cliente_flutter")) {
