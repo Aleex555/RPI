@@ -78,6 +78,7 @@ public class ChatServer extends WebSocketServer {
         objWlc.put("value", "Welcome to the chat server");
         conn.send(objWlc.toString()); 
 
+
         // Li enviem el seu identificador
         JSONObject objId = new JSONObject("{}");
         objId.put("type", "id");
@@ -114,6 +115,7 @@ public class ChatServer extends WebSocketServer {
 
         // Mostrem per pantalla (servidor) la desconnexió
         System.out.println("Client disconnected '" + clientId + "'");
+        
     }
 
     @Override
@@ -152,22 +154,43 @@ public void onMessage(WebSocket conn, String message) {
             }
 
         } else if (type.equalsIgnoreCase("broadcast")) {
+            String from = objRequest.getString("from");
             // El client envia un missatge a tots els clients
-            System.out.println("Client '" + clientId + "'' sends a broadcast message to everyone");
+            
             //displayMensaje.displayHolaMundo();
-
-            JSONObject objResponse = new JSONObject("{}");
-            objResponse.put("type", "broadcast");
-            objResponse.put("from", clientId);
-            objResponse.put("value", objRequest.getString("value"));
+            if (from.equalsIgnoreCase("Flutter")) {
+                System.out.println("Cliente Flutter "+clientId+" envio un mensaje-->");
+            }else if (from.equalsIgnoreCase("Android")) {
+                System.out.println("Cliente Android "+clientId+" envio un mensaje-->");
+            }
+     
+            
+                JSONObject objResponse = new JSONObject("{}");
+                objResponse.put("type", "broadcast");
+                objResponse.put("from", clientId);
+                objResponse.put("value", objRequest.getString("value"));
+            
             broadcast(objResponse.toString());
             String textoenviado = objRequest.getString("value");
 
             commandExecutor.executeCommand(textoenviado);
+            
 
             // Llamar al método de DisplayMensaje
             
         }
+        /*
+        else if (type.equalsIgnoreCase("cliente_flutter")) {
+           
+            JSONObject objResponse = new JSONObject("{}");
+            objResponse.put("type", "cliente_flutter");
+            objResponse.put("value", objRequest.getString("value"));
+            String cliente_tipo = objRequest.getString("value");
+            System.out.println("From --> "+cliente_tipo);
+       
+            
+        }
+        */
 
     } catch (Exception e) {
         e.printStackTrace();
@@ -192,21 +215,28 @@ public void onMessage(WebSocket conn, String message) {
                     running = false;
                 }
             } 
+            try {
+            CommandExecutor.detenerProceso();
+        } catch (Exception e) {
+            
+        }
             System.out.println("Stopping server");
             stop(1000);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }  
     }
+    
 
     private void sendList(WebSocket conn) {
-        JSONObject objResponse = new JSONObject("{}");
-        objResponse.put("type", "list");
-        objResponse.put("from", "server");
-        objResponse.put("list", getClients());
-        objResponse.put("clientType", connectionTypes.get(conn)); // Enviar el tipo de cliente al cliente
-        conn.send(objResponse.toString());
-    }
+    JSONObject objResponse = new JSONObject("{}");
+    objResponse.put("type", "list");
+    objResponse.put("from", "server");
+    objResponse.put("list", getClients());
+    
+
+    conn.send(objResponse.toString());
+}
 
     public String getConnectionId (WebSocket connection) {
         String name = connection.toString();
