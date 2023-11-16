@@ -131,11 +131,18 @@ public void onMessage(WebSocket conn, String message) {
         String type = objRequest.getString("type");
 
         if (type.equalsIgnoreCase("registro")) {
-            // El client demana la llista de tots els clients
-             JSONObject objResponse = new JSONObject("{}");
-            objResponse.put("type", "ok");
-            conn.send(objResponse.toString());
-            System.out.println("Client '" + clientId + "'' se ha unido con credenciales");
+            String usuario = objRequest.getString("user");
+            String contra = objRequest.getString("password");
+            boolean verificador = commandExecutor.verificarCredenciales(usuario,contra);
+            if (verificador==true){
+                JSONObject objResponse = new JSONObject("{}");
+                objResponse.put("type", "ok");
+                conn.send(objResponse.toString());
+                System.out.println("credenciales correctas");
+            }else if (verificador==false){
+                System.out.println("credenciales incorrectas");
+            }
+
 
         }else if (type.equalsIgnoreCase("list")) {
             // El client demana la llista de tots els clients
@@ -180,24 +187,23 @@ public void onMessage(WebSocket conn, String message) {
             broadcast(objResponse.toString());
             String textoenviado = objRequest.getString("value");
 
+            boolean isaliveMensaje = commandExecutor.isProcesoAlive();
+
+            if (isaliveMensaje){
+                try {
+                    commandExecutor.detenerProcesoMensaje();
+                } catch (Exception e) {
+            
+                }
+            }
+
             commandExecutor.executeCommand(textoenviado);
             
 
             // Llamar al método de DisplayMensaje
             
         }
-        /*
-        else if (type.equalsIgnoreCase("cliente_flutter")) {
-           
-            JSONObject objResponse = new JSONObject("{}");
-            objResponse.put("type", "cliente_flutter");
-            objResponse.put("value", objRequest.getString("value"));
-            String cliente_tipo = objRequest.getString("value");
-            System.out.println("From --> "+cliente_tipo);
-       
-            
-        }
-        */
+        
 
     } catch (Exception e) {
         e.printStackTrace();
@@ -224,6 +230,7 @@ public void onMessage(WebSocket conn, String message) {
             } 
             try {
             CommandExecutor.detenerProceso();
+            commandExecutor.detenerProcesoMensaje();
         } catch (Exception e) {
             
         }

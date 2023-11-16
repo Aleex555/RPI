@@ -1,0 +1,17 @@
+{
+    "usuarios": [
+      {
+        "usuario": "alex",
+        "contrasena": "1234"
+      },
+      {
+        "usuario": "cristian",
+        "contrasena": "1234"
+      },
+      {
+        "usuario": "yuhi",
+        "contrasena": "1234"
+      }
+    ]
+  }
+  
