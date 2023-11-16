@@ -1,5 +1,9 @@
 package com.project;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.util.Base64;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,6 +28,7 @@ public class CommandExecutor {
 
     private static Process procesoIp;
     private static Process procesoMensaje;
+    private static Process procesoImagen;
 
 
     public void executeCommand(String mensaje) {
@@ -51,6 +56,43 @@ public class CommandExecutor {
             
             if (variable) {
                 procesoMensaje.waitFor();
+            }
+            
+            System.out.println("INFORMACION ENVIADA CON EXITO");
+
+           
+
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void executeImagen(String imagen) {
+        
+        String displayImage = imagen;
+
+        // Directorio de trabajo basado en el directorio de inicio del usuario
+
+        String workingDirectory = "/home/ieti/dev/rpi-rgb-led-matrix";
+        //String workingDirectory = "/home/super";
+        // Comando a ejecutar (personalizado según tus necesidades)
+        
+        System.out.println(displayImage);
+        String command = "utils/led-image-viewer -C --led-cols=64 --led-rows=64 --led-slowdown-gpio=4 --led-no-hardware-pulse ~/Baixades/RPI/server_java/data/"+displayImage;
+        //String command = "mkdir "+mensaje;
+
+        try {
+            // Crear el proceso builder y configurar el directorio de trabajo
+            ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", command);
+            processBuilder.directory(new File(workingDirectory));
+
+            // Redirigir la salida del proceso a la consola
+            processBuilder.redirectErrorStream(true);
+            procesoImagen = processBuilder.start();
+
+            
+            if (variable) {
+                procesoImagen.waitFor();
             }
             
             System.out.println("INFORMACION ENVIADA CON EXITO");
@@ -101,6 +143,18 @@ public class CommandExecutor {
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void detenerProcesoImagen() throws InterruptedException {
+        procesoImagen.destroy();
+        procesoImagen.waitFor();
+    }
+    public static boolean isProcesoImagenAlive() {
+        if (procesoImagen == null) {
+            return false;
+        }else {
+            return true;
         }
     }
 
@@ -157,5 +211,53 @@ public class CommandExecutor {
             System.err.println("Error al leer el archivo JSON: " + e.getMessage());
         }
         return false;
+    }
+
+    //conversor de imagenes
+    public static void conversorImagen(String base64Image){
+        //Recibe un str de base64 y convierte en jpg
+        try {
+
+            // Decodificar Base64 a arreglo de bytes
+            byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+
+            // Convertir bytes a BufferedImage
+            ByteArrayInputStream bais = new ByteArrayInputStream(imageBytes);
+            BufferedImage image = ImageIO.read(bais);
+
+            // Guardar la imagen 
+            String path
+            File outputFile = new File("data/2copy.jpg");
+            ImageIO.write(image, "jpg", outputFile);
+            //
+            System.out.println("Imagen guardada con éxito.");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    };
+
+    public static String readTextFromFile(String filePath) {
+        StringBuilder content = new StringBuilder();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                content.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();  // Manejo básico de excepciones, puedes personalizarlo según tus necesidades
+        }
+
+        return content.toString();
+    }
+
+    public static void writeTextToFile(String filePath, String content) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            writer.write(content);
+        } catch (IOException e) {
+            e.printStackTrace();  // Manejo básico de excepciones, puedes personalizarlo según tus necesidades
+        }
     }
 }

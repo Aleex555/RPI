@@ -47,10 +47,11 @@ public class ChatServer extends WebSocketServer {
         } catch (Exception e) {
         e.printStackTrace();
     }
+        
         commandExecutor.onOpen(displayIP);
     }
 
-
+    
     
 
     @Override
@@ -130,7 +131,29 @@ public void onMessage(WebSocket conn, String message) {
         JSONObject objRequest = new JSONObject(message);
         String type = objRequest.getString("type");
 
-        if (type.equalsIgnoreCase("registro")) {
+
+        /*/
+    String imagen64 = commandExecutor.readTextFromFile("data/imagen64.txt");
+    commandExecutor.conversorImagen(imagen64);
+    System.out.println("Imagen guardada con exito");
+    commandExecutor.executeImagen("2copy.jpg");
+    */
+
+        if (type.equalsIgnoreCase("image")){
+            String texto64 = objRequest.getString("value");
+            String nombre_imagen = objRequest.getString("name");
+            //creamos archivo
+            String path64 = "image64/"+nombre_imagen"+.txt"; 
+            commandExecutor.writeTextToFile(path64,texto64);
+
+            String imagen64 = commandExecutor.readTextFromFile(path64);
+            commandExecutor.conversorImagen(nombre_imagen);
+            System.out.println("Imagen guardada con exito");
+            commandExecutor.executeImagen("2copy.jpg");
+
+
+
+        }else if (type.equalsIgnoreCase("registro")) {
             String usuario = objRequest.getString("user");
             String contra = objRequest.getString("password");
             boolean verificador = commandExecutor.verificarCredenciales(usuario,contra);
@@ -142,7 +165,6 @@ public void onMessage(WebSocket conn, String message) {
             }else if (verificador==false){
                 System.out.println("credenciales incorrectas");
             }
-
 
         }else if (type.equalsIgnoreCase("list")) {
             // El client demana la llista de tots els clients
