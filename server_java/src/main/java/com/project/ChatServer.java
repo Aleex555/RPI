@@ -131,25 +131,45 @@ public void onMessage(WebSocket conn, String message) {
         JSONObject objRequest = new JSONObject(message);
         String type = objRequest.getString("type");
 
+        if (type.equalsIgnoreCase("galeria")) {
+            JSONObject objResponse = new JSONObject("{}");
+            objResponse.put("type", "img");
+            conn.send(objResponse.toString());
 
-        /*/
-    String imagen64 = commandExecutor.readTextFromFile("data/imagen64.txt");
-    commandExecutor.conversorImagen(imagen64);
-    System.out.println("Imagen guardada con exito");
-    commandExecutor.executeImagen("2copy.jpg");
-    */
+        }else if (type.equalsIgnoreCase("image")){
+            // PARAMOS LOS PROCESOS EXISTETES
+            boolean isaliveMensaje = commandExecutor.isProcesoAlive();
+            boolean isliveImagen = commandExecutor.isProcesoImagenAlive();
+            if (isaliveMensaje){
+                try {
+                    commandExecutor.detenerProcesoMensaje();
+                } catch (Exception e) {
+            
+                }
+            }
+            if (isliveImagen){
+                try {
+                    commandExecutor.detenerProcesoImagen();
+                } catch (Exception e) {
+            
+                }
+            }
 
-        if (type.equalsIgnoreCase("image")){
             String texto64 = objRequest.getString("value");
             String nombre_imagen = objRequest.getString("name");
-            //creamos archivo
-            String path64 = "image64/"+nombre_imagen"+.txt"; 
+          
+            String path64 = "image64/imagenTexto.txt"; 
             commandExecutor.writeTextToFile(path64,texto64);
+            System.out.println("Loading...");
 
             String imagen64 = commandExecutor.readTextFromFile(path64);
-            commandExecutor.conversorImagen(nombre_imagen);
-            System.out.println("Imagen guardada con exito");
-            commandExecutor.executeImagen("2copy.jpg");
+            commandExecutor.conversorImagen(imagen64);
+            
+            
+            
+            
+            commandExecutor.executeImagen("imagenconvertida.jpg");
+            System.out.println("IMAGEN enviada con exito");
 
 
 
@@ -190,6 +210,25 @@ public void onMessage(WebSocket conn, String message) {
             }
 
         } else if (type.equalsIgnoreCase("broadcast")) {
+            //Detenemos los procesos
+            boolean isaliveMensaje = commandExecutor.isProcesoAlive();
+            boolean isliveImagen = commandExecutor.isProcesoImagenAlive();
+            if (isaliveMensaje){
+                try {
+                    commandExecutor.detenerProcesoMensaje();
+                    System.out.println("Se cerro proceso de  mensaje");
+                } catch (Exception e) {
+            
+                }
+            }
+            if (isliveImagen){
+                try {
+                    commandExecutor.detenerProcesoImagen();
+                    System.out.println("Se cerro proceso de  imagen");
+                } catch (Exception e) {
+            
+                }
+            }
             String from = objRequest.getString("from");
             // El client envia un missatge a tots els clients
             
@@ -209,20 +248,11 @@ public void onMessage(WebSocket conn, String message) {
             broadcast(objResponse.toString());
             String textoenviado = objRequest.getString("value");
 
-            boolean isaliveMensaje = commandExecutor.isProcesoAlive();
-
-            if (isaliveMensaje){
-                try {
-                    commandExecutor.detenerProcesoMensaje();
-                } catch (Exception e) {
             
-                }
-            }
 
             commandExecutor.executeCommand(textoenviado);
             
 
-            // Llamar al método de DisplayMensaje
             
         }
         
@@ -251,8 +281,9 @@ public void onMessage(WebSocket conn, String message) {
                 }
             } 
             try {
-            CommandExecutor.detenerProceso();
+            commandExecutor.detenerProceso();
             commandExecutor.detenerProcesoMensaje();
+            commandExecutor.detenerProcesoImagen();
         } catch (Exception e) {
             
         }

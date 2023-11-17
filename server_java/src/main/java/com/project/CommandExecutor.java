@@ -90,11 +90,10 @@ public class CommandExecutor {
             processBuilder.redirectErrorStream(true);
             procesoImagen = processBuilder.start();
 
-            
             if (variable) {
                 procesoImagen.waitFor();
             }
-            
+       
             System.out.println("INFORMACION ENVIADA CON EXITO");
 
            
@@ -146,6 +145,7 @@ public class CommandExecutor {
         }
     }
 
+    //PROCESOS DE LA IMAGEN
     public static void detenerProcesoImagen() throws InterruptedException {
         procesoImagen.destroy();
         procesoImagen.waitFor();
@@ -158,6 +158,8 @@ public class CommandExecutor {
         }
     }
 
+
+    //PROCESOS DE LA IP
     public static void detenerProceso() throws InterruptedException {
         procesoIp.destroy();
         procesoIp.waitFor();
@@ -171,6 +173,8 @@ public class CommandExecutor {
         }
     }
 
+
+    //PROCESOS DEL MENSAJE
     public static void detenerProcesoMensaje() throws InterruptedException {
         procesoMensaje.destroy();
         procesoMensaje.waitFor();
@@ -214,10 +218,8 @@ public class CommandExecutor {
     }
 
     //conversor de imagenes
-    public static void conversorImagen(String base64Image){
-        //Recibe un str de base64 y convierte en jpg
+    public static void conversorImagen(String base64Image) {
         try {
-
             // Decodificar Base64 a arreglo de bytes
             byte[] imageBytes = Base64.getDecoder().decode(base64Image);
 
@@ -225,17 +227,25 @@ public class CommandExecutor {
             ByteArrayInputStream bais = new ByteArrayInputStream(imageBytes);
             BufferedImage image = ImageIO.read(bais);
 
-            // Guardar la imagen 
-            String path
-            File outputFile = new File("data/2copy.jpg");
+            // Verificar si el archivo existe y eliminarlo si es necesario
+            File outputFile = new File("data/imagenconvertida.jpg");
+            if (outputFile.exists()) {
+                if (outputFile.delete()) {
+                    System.out.println("Archivo existente eliminado con éxito.");
+                } else {
+                    System.out.println("No se pudo eliminar el archivo existente.");
+                }
+            }
+
+            // Escribir la nueva imagen en el archivo
             ImageIO.write(image, "jpg", outputFile);
-            //
+
             System.out.println("Imagen guardada con éxito.");
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-    };
+    }
 
     public static String readTextFromFile(String filePath) {
         StringBuilder content = new StringBuilder();
