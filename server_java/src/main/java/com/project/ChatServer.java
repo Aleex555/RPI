@@ -36,7 +36,6 @@ public class ChatServer extends WebSocketServer {
         // Quan el servidor s'inicia
         String host = getAddress().getAddress().getHostAddress();
         int port = getAddress().getPort();
-        System.out.println("WebSockets server running at: ws://" + host + ":" + port);
         System.out.println("Type 'exit' to stop and exit server.");
         setConnectionLostTimeout(0);
         setConnectionLostTimeout(100);
