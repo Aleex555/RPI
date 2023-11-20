@@ -135,6 +135,11 @@ public void onMessage(WebSocket conn, String message) {
             objResponse.put("type", "img");
             conn.send(objResponse.toString());
 
+        }if (type.equalsIgnoreCase("connected")) {
+            JSONObject objResponse = new JSONObject("{}");
+            objResponse.put("type", "ok");
+            conn.send(objResponse.toString());
+
         }else if (type.equalsIgnoreCase("image")){
             // PARAMOS LOS PROCESOS EXISTETES
             boolean isaliveMensaje = commandExecutor.isProcesoAlive();
@@ -183,29 +188,6 @@ public void onMessage(WebSocket conn, String message) {
                 System.out.println("credenciales correctas");
             }else if (verificador==false){
                 System.out.println("credenciales incorrectas");
-            }
-
-        }else if (type.equalsIgnoreCase("list")) {
-            // El client demana la llista de tots els clients
-            System.out.println("Client '" + clientId + "' with type '" + clientType + "' requests list of clients");
-            sendList(conn);
-
-        } else if (type.equalsIgnoreCase("private")) {
-            // El client envia un missatge privat a un altre client
-            System.out.println("Client '" + clientId + "'' sends a private message");
-
-            JSONObject objResponse = new JSONObject("{}");
-            objResponse.put("type", "private");
-            objResponse.put("from", clientId);
-            objResponse.put("value", objRequest.getString("value"));
-
-            String destination = objRequest.getString("destination");
-            WebSocket desti = getClientById(destination);
-
-            
-
-            if (desti != null) {
-                desti.send(objResponse.toString());
             }
 
         } else if (type.equalsIgnoreCase("broadcast")) {
