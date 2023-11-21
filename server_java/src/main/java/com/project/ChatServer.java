@@ -1,6 +1,7 @@
 package com.project;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
@@ -9,12 +10,14 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
-
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 import org.json.JSONObject;
+
 
 public class ChatServer extends WebSocketServer {
 
@@ -35,7 +38,7 @@ public class ChatServer extends WebSocketServer {
     public void onStart() {
         // Quan el servidor s'inicia
         String host = getAddress().getAddress().getHostAddress();
-        int port = getAddress().getPort();
+        int port =exit getAddress().getPort();
         System.out.println("Type 'exit' to stop and exit server.");
         setConnectionLostTimeout(0);
         setConnectionLostTimeout(100);
@@ -45,8 +48,17 @@ public class ChatServer extends WebSocketServer {
             displayIP = Main.getLocalIPAddress();
         } catch (Exception e) {
         e.printStackTrace();
-    }
+
+        // Crear un mapa con la información que deseas incluir en el JSON
+        Map<String, Object> jsonData = new HashMap<>();
+        jsonData.put("nombre", "NombreDelJuego");
+        jsonData.put("usuario", "NombreDeUsuario");
+        jsonData.put("from", displayIP);
+
         
+         
+    }
+        CommandExecutor.eliminarJSON();
         commandExecutor.onOpen(displayIP);
     }
 
@@ -142,18 +154,18 @@ public void onMessage(WebSocket conn, String message) {
 
         }else if (type.equalsIgnoreCase("image")){
             // PARAMOS LOS PROCESOS EXISTETES
-            boolean isaliveMensaje = commandExecutor.isProcesoAlive();
-            boolean isliveImagen = commandExecutor.isProcesoImagenAlive();
+            boolean isaliveMensaje = CommandExecutor.isProcesoAlive();
+            boolean isliveImagen = CommandExecutor.isProcesoImagenAlive();
             if (isaliveMensaje){
                 try {
-                    commandExecutor.detenerProcesoMensaje();
+                    CommandExecutor.detenerProcesoMensaje();
                 } catch (Exception e) {
             
                 }
             }
             if (isliveImagen){
                 try {
-                    commandExecutor.detenerProcesoImagen();
+                    CommandExecutor.detenerProcesoImagen();
                 } catch (Exception e) {
             
                 }
@@ -163,11 +175,11 @@ public void onMessage(WebSocket conn, String message) {
             String nombre_imagen = objRequest.getString("name");
           
             String path64 = "image64/imagenTexto.txt"; 
-            commandExecutor.writeTextToFile(path64,texto64);
+            CommandExecutor.writeTextToFile(path64,texto64);
             System.out.println("Loading...");
 
-            String imagen64 = commandExecutor.readTextFromFile(path64);
-            commandExecutor.conversorImagen(imagen64);
+            String imagen64 = CommandExecutor.readTextFromFile(path64);
+            CommandExecutor.conversorImagen(imagen64);
             
             
             
@@ -180,23 +192,28 @@ public void onMessage(WebSocket conn, String message) {
         }else if (type.equalsIgnoreCase("registro")) {
             String usuario = objRequest.getString("user");
             String contra = objRequest.getString("password");
-            boolean verificador = commandExecutor.verificarCredenciales(usuario,contra);
+            String from = objRequest.getString("from");
+            boolean verificador = CommandExecutor.verificarCredenciales(usuario,contra);
             if (verificador==true){
                 JSONObject objResponse = new JSONObject("{}");
                 objResponse.put("type", "ok");
                 conn.send(objResponse.toString());
                 System.out.println("credenciales correctas");
+                CommandExecutor.conectadosJSON(usuario,from);
             }else if (verificador==false){
+                JSONObject objResponse = new JSONObject("{}");
                 System.out.println("credenciales incorrectas");
+                objResponse.put("type", "no");
+                conn.send(objResponse.toString());
             }
 
         } else if (type.equalsIgnoreCase("broadcast")) {
             //Detenemos los procesos
-            boolean isaliveMensaje = commandExecutor.isProcesoAlive();
-            boolean isliveImagen = commandExecutor.isProcesoImagenAlive();
+            boolean isaliveMensaje = CommandExecutor.isProcesoAlive();
+            boolean isliveImagen = CommandExecutor.isProcesoImagenAlive();
             if (isaliveMensaje){
                 try {
-                    commandExecutor.detenerProcesoMensaje();
+                    CommandExecutor.detenerProcesoMensaje();
                     System.out.println("Se cerro proceso de  mensaje");
                 } catch (Exception e) {
             
@@ -204,7 +221,7 @@ public void onMessage(WebSocket conn, String message) {
             }
             if (isliveImagen){
                 try {
-                    commandExecutor.detenerProcesoImagen();
+                    CommandExecutor.detenerProcesoImagen();
                     System.out.println("Se cerro proceso de  imagen");
                 } catch (Exception e) {
             
@@ -262,9 +279,9 @@ public void onMessage(WebSocket conn, String message) {
                 }
             } 
             try {
-            commandExecutor.detenerProceso();
-            commandExecutor.detenerProcesoMensaje();
-            commandExecutor.detenerProcesoImagen();
+            CommandExecutor.detenerProceso();
+            CommandExecutor.detenerProcesoMensaje();
+            CommandExecutor.detenerProcesoImagen();
         } catch (Exception e) {
             
         }

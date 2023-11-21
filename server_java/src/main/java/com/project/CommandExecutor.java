@@ -4,11 +4,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Base64;
-
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -268,6 +264,98 @@ public class CommandExecutor {
             writer.write(content);
         } catch (IOException e) {
             e.printStackTrace();  // Manejo básico de excepciones, puedes personalizarlo según tus necesidades
+        }
+    }
+
+    public static void eliminarJSON() {
+        String rutaArchivo = "data/conectados.json";
+        File archivoJSON = new File(rutaArchivo);
+
+        if (archivoJSON.exists()) {
+            boolean eliminado = archivoJSON.delete();
+            if (eliminado) {
+                System.out.println("El archivo conectados.json fue eliminado correctamente.");
+            } else {
+                System.out.println("No se pudo eliminar el archivo conectados.json.");
+            }
+        } else {
+            System.out.println("El archivo conectados.json no existe en la carpeta data.");
+        }
+    }
+
+    public static void conectadosJSON(String nombre, String from) {
+        String rutaArchivo = "data/conectados.json";
+
+        // Verificar si el archivo ya existe
+        if (Files.exists(Paths.get(rutaArchivo))) {
+            // Leer el contenido actual del archivo
+            String contenidoActual = leerContenido(rutaArchivo);
+
+            // Crear un objeto JSON con la nueva información
+            JSONObject nuevoUsuario = new JSONObject();
+            nuevoUsuario.put("nombre", nombre);
+            nuevoUsuario.put("from", from);
+
+            // Verificar si ya hay usuarios en el archivo
+            JSONObject jsonObject;
+            if (!contenidoActual.isEmpty()) {
+                // Si hay usuarios existentes, obtener el objeto JSON principal
+                jsonObject = new JSONObject(contenidoActual);
+            } else {
+                // Si no hay usuarios existentes, crear un nuevo objeto JSON principal con un arreglo vacío
+                jsonObject = new JSONObject();
+                jsonObject.put("usuarios", new JSONArray());
+            }
+
+            // Obtener el arreglo de usuarios
+            JSONArray usuariosArray = jsonObject.getJSONArray("usuarios");
+
+            // Agregar el nuevo usuario al arreglo
+            usuariosArray.put(nuevoUsuario);
+
+            // Escribir el contenido actualizado en el archivo
+            escribirContenido(rutaArchivo, jsonObject.toString(4));
+
+            System.out.println("Usuario agregado al archivo JSON correctamente.");
+        } else {
+            // Si el archivo no existe, crear uno nuevo con el nuevo usuario dentro de un arreglo "usuarios"
+            JSONObject jsonObject = new JSONObject();
+            JSONArray usuariosArray = new JSONArray();
+
+            // Crear un objeto JSON con la nueva información
+            JSONObject nuevoUsuario = new JSONObject();
+            nuevoUsuario.put("nombre", nombre);
+            nuevoUsuario.put("from", from);
+
+            // Agregar el nuevo usuario al arreglo
+            usuariosArray.put(nuevoUsuario);
+
+            // Agregar el arreglo de usuarios al objeto principal
+            jsonObject.put("usuarios", usuariosArray);
+
+            try (FileWriter fileWriter = new FileWriter(rutaArchivo)) {
+                fileWriter.write(jsonObject.toString(4));
+                System.out.println("Archivo JSON creado correctamente.");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static String leerContenido(String rutaArchivo) {
+        try {
+            return new String(Files.readAllBytes(Paths.get(rutaArchivo)));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    private static void escribirContenido(String rutaArchivo, String contenido) {
+        try (FileWriter fileWriter = new FileWriter(rutaArchivo)) {
+            fileWriter.write(contenido);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
