@@ -4,6 +4,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Base64;
+import java.util.HashMap;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -14,6 +15,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONTokener;
+
+import java.util.Iterator;
+import java.util.Map;
+
 
 public class CommandExecutor {
     
@@ -283,7 +289,7 @@ public class CommandExecutor {
         }
     }
 
-    public static void conectadosJSON(String nombre, String from) {
+    public static void conectadosJSON(String nombre, String from , String id) {
         String rutaArchivo = "data/conectados.json";
 
         // Verificar si el archivo ya existe
@@ -293,8 +299,10 @@ public class CommandExecutor {
 
             // Crear un objeto JSON con la nueva información
             JSONObject nuevoUsuario = new JSONObject();
+            nuevoUsuario.put("id", id);
             nuevoUsuario.put("nombre", nombre);
             nuevoUsuario.put("from", from);
+            
 
             // Verificar si ya hay usuarios en el archivo
             JSONObject jsonObject;
@@ -324,6 +332,7 @@ public class CommandExecutor {
 
             // Crear un objeto JSON con la nueva información
             JSONObject nuevoUsuario = new JSONObject();
+            nuevoUsuario.put("id", id);
             nuevoUsuario.put("nombre", nombre);
             nuevoUsuario.put("from", from);
 
@@ -357,5 +366,91 @@ public class CommandExecutor {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void eliminarUsuarioPorId(String userId) {
+        String jsonContent = "";
+        try {
+            jsonContent = new String(Files.readAllBytes(Paths.get("data/conectados.json")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    
+        if (!jsonContent.isEmpty()) {
+            JSONObject json = new JSONObject(jsonContent);
+            JSONArray usuarios = json.getJSONArray("usuarios");
+    
+            Iterator<Object> iterator = usuarios.iterator();
+            while (iterator.hasNext()) {
+                JSONObject usuario = (JSONObject) iterator.next();
+                String id = usuario.getString("id");
+                if (id.equals(userId)) {
+                    iterator.remove();
+                    break;
+                }
+            }
+    
+            json.put("usuarios", usuarios);
+    
+            try {
+                Files.write(Paths.get("data/conectados.json"), json.toString().getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }}
+
+        public static Map<String, String> convertirJsonAHashMap() throws Exception {
+        Map<String, String> hashMap = new HashMap<>();
+
+        try (FileReader reader = new FileReader("data/conectados.json")) {
+            // Parsear el archivo JSON
+            JSONObject jsonObject = new JSONObject(new JSONTokener(reader));
+
+            // Obtener la lista de usuarios
+            JSONArray usuarios = jsonObject.getJSONArray("usuarios");
+
+            // Iterar sobre la lista y agregar al HashMap
+            for (int i = 0; i < usuarios.length(); i++) {
+                JSONObject usuario = usuarios.getJSONObject(i);
+                String nombre = usuario.getString("nombre");
+                String from = usuario.getString("from");
+
+                // Si ya existe un valor para la clave, concatenar los valores con un separador
+                if (hashMap.containsKey(nombre)) {
+                    String valorExistente = hashMap.get(nombre);
+                    hashMap.put(nombre, valorExistente);
+                } else {
+                    hashMap.put(nombre, from);
+                }
+            }
+        }
+        System.out.println(hashMap);
+        return hashMap;
+    }
+    
+    public static Map<String, String> obtenerNombreYFromPorId(String id) throws Exception {
+        Map<String, String> resultado = new HashMap<>();
+
+        try (FileReader reader = new FileReader("data/conectados.json")) {
+            // Parsear el archivo JSON
+            JSONObject jsonObject = new JSONObject(new JSONTokener(reader));
+
+            // Obtener la lista de usuarios
+            JSONArray usuarios = jsonObject.getJSONArray("usuarios");
+
+            // Buscar en la lista por ID
+            for (int i = 0; i < usuarios.length(); i++) {
+                JSONObject usuario = usuarios.getJSONObject(i);
+                String idUsuario = usuario.getString("id");
+
+                if (idUsuario.equals(id)) {
+                    resultado.put("nombre", usuario.getString("nombre"));
+                    resultado.put("from", usuario.getString("from"));
+                    return resultado;
+                }
+            }
+        }
+
+        return null; // Retornar null si no se encuentra el ID
     }
 }

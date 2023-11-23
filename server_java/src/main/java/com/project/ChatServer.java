@@ -9,6 +9,7 @@ import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 
@@ -27,7 +29,6 @@ public class ChatServer extends WebSocketServer {
 
     private ConcurrentHashMap<WebSocket, String> connectionTypes = new ConcurrentHashMap<>();
 
-
     public ChatServer (int port) {
         super(new InetSocketAddress(port));
     }
@@ -38,7 +39,7 @@ public class ChatServer extends WebSocketServer {
     public void onStart() {
         // Quan el servidor s'inicia
         String host = getAddress().getAddress().getHostAddress();
-        int port =exit getAddress().getPort();
+        int port = getAddress().getPort();
         System.out.println("Type 'exit' to stop and exit server.");
         setConnectionLostTimeout(0);
         setConnectionLostTimeout(100);
@@ -54,12 +55,15 @@ public class ChatServer extends WebSocketServer {
         jsonData.put("nombre", "NombreDelJuego");
         jsonData.put("usuario", "NombreDeUsuario");
         jsonData.put("from", displayIP);
+        
+
 
         
          
     }
         CommandExecutor.eliminarJSON();
         commandExecutor.onOpen(displayIP);
+       
     }
 
     
@@ -83,12 +87,7 @@ public class ChatServer extends WebSocketServer {
         
         //pruebaaaaaaaaaaaaaaaa
 
-        // Saludem personalment al nou client
-        JSONObject objWlc = new JSONObject("{}");
-        objWlc.put("type", "private");
-        objWlc.put("from", "server");
-        objWlc.put("value", "Welcome to the chat server");
-        conn.send(objWlc.toString()); 
+   
 
 
         // Li enviem el seu identificador
@@ -99,18 +98,9 @@ public class ChatServer extends WebSocketServer {
         conn.send(objId.toString()); 
 
         // Enviem al client la llista amb tots els clients connectats
-        sendList(conn);
 
-        // Enviem la direcció URI del nou client a tothom 
-        JSONObject objCln = new JSONObject("{}");
-        objCln.put("type", "connected");
-        objCln.put("from", "server");
-        objCln.put("id", clientId);
-        broadcast(objCln.toString());
-
-        // Mostrem per pantalla (servidor) la nova connexió
-        String host = conn.getRemoteSocketAddress().getAddress().getHostAddress();
-        System.out.println("New client (" + clientId + "): " + host);
+     
+ 
     }
 
     @Override
@@ -119,15 +109,32 @@ public class ChatServer extends WebSocketServer {
         String clientId = getConnectionId(conn);
 
         // Informem a tothom que el client s'ha desconnectat
+        /*/
+        Map<String, String> resultado = new Map ();
+        try {
+            resultado = CommandExecutor.obtenerNombreYFromPorId(clientId);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
         JSONObject objCln = new JSONObject("{}");
         objCln.put("type", "disconnected");
         objCln.put("from", "server");
-        objCln.put("id", clientId);
+        objCln.put("usuario", resultado.get("nombre"));
+        objCln.put("from", resultado.get("from"));
         broadcast(objCln.toString());
-
+        */
         // Mostrem per pantalla (servidor) la desconnexió
         System.out.println("Client disconnected '" + clientId + "'");
-        
+        /* 
+        JSONObject objResponse1 = new JSONObject("{}");
+                objResponse1.put("type", "connected");
+                objResponse1.put("usuario", objRequest.getString("user"));
+                objResponse1.put("from", objRequest.getString("from"));
+                objResponse1.put("id", clientId);
+                broadcast(objResponse1.toString());
+        */
     }
 
     @Override
@@ -152,7 +159,13 @@ public void onMessage(WebSocket conn, String message) {
             objResponse.put("type", "ok");
             conn.send(objResponse.toString());
 
-        }else if (type.equalsIgnoreCase("image")){
+        }if (type.equalsIgnoreCase("list")) {
+            // El client demana la llista de tots els clients
+            
+            CommandExecutor.convertirJsonAHashMap();
+            sendList(conn);
+
+        } else if (type.equalsIgnoreCase("image")){
             // PARAMOS LOS PROCESOS EXISTETES
             boolean isaliveMensaje = CommandExecutor.isProcesoAlive();
             boolean isliveImagen = CommandExecutor.isProcesoImagenAlive();
@@ -199,7 +212,17 @@ public void onMessage(WebSocket conn, String message) {
                 objResponse.put("type", "ok");
                 conn.send(objResponse.toString());
                 System.out.println("credenciales correctas");
-                CommandExecutor.conectadosJSON(usuario,from);
+                CommandExecutor.conectadosJSON(usuario,from,clientId);
+                
+                JSONObject objResponse1 = new JSONObject("{}");
+                objResponse1.put("type", "connected");
+                objResponse1.put("usuario", objRequest.getString("user"));
+                objResponse1.put("from", objRequest.getString("from"));
+                objResponse1.put("id", clientId);
+                broadcast(objResponse1.toString());
+                
+                
+
             }else if (verificador==false){
                 JSONObject objResponse = new JSONObject("{}");
                 System.out.println("credenciales incorrectas");
@@ -237,15 +260,19 @@ public void onMessage(WebSocket conn, String message) {
                 System.out.println("Cliente Android "+clientId+" envio un mensaje-->");
             }
      
-            
-                JSONObject objResponse = new JSONObject("{}");
-                objResponse.put("type", "broadcast");
-                objResponse.put("from", clientId);
-                objResponse.put("value", objRequest.getString("value"));
-            
-            broadcast(objResponse.toString());
             String textoenviado = objRequest.getString("value");
 
+            String usuarioSendMessage = objRequest.getString("usuario");
+            String usuarioFrom = objRequest.getString("from");
+
+
+            JSONObject objResponse1 = new JSONObject("{}");
+            objResponse1.put("type", "infomensaje");
+            objResponse1.put("usuario", usuarioSendMessage);
+            objResponse1.put("from", usuarioFrom);
+            objResponse1.put("id", clientId);
+            broadcast(objResponse1.toString());
+            
             
 
             commandExecutor.executeCommand(textoenviado);
@@ -293,11 +320,11 @@ public void onMessage(WebSocket conn, String message) {
     }
     
 
-    private void sendList(WebSocket conn) {
+    private void sendList(WebSocket conn) throws JSONException, Exception {
     JSONObject objResponse = new JSONObject("{}");
     objResponse.put("type", "list");
     objResponse.put("from", "server");
-    objResponse.put("list", getClients());
+    objResponse.put("list", CommandExecutor.convertirJsonAHashMap());
     
 
     conn.send(objResponse.toString());
