@@ -26,13 +26,23 @@ public class ChatServer extends WebSocketServer {
     static BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
     //private Displaymensaje displayMensaje = new Displaymensaje();
     private CommandExecutor commandExecutor = new CommandExecutor();
+    private int conexionesTotales;
+    
 
     private ConcurrentHashMap<WebSocket, String> connectionTypes = new ConcurrentHashMap<>();
 
     public ChatServer (int port) {
         super(new InetSocketAddress(port));
     }
-    
+
+    public int getConexionesTotales() {
+        return conexionesTotales;
+    }
+
+    // Setter
+    public void setConexionesTotales(int conexionesTotales) {
+        this.conexionesTotales = conexionesTotales;
+    }
     
 
     @Override
@@ -61,7 +71,9 @@ public class ChatServer extends WebSocketServer {
         
          
     }
+        setConexionesTotales(0);
         CommandExecutor.eliminarJSON();
+        Usuarios.crearUsuariosJSON();
         commandExecutor.onOpen(displayIP);
        
     }
@@ -109,32 +121,31 @@ public class ChatServer extends WebSocketServer {
         String clientId = getConnectionId(conn);
 
         // Informem a tothom que el client s'ha desconnectat
-        /*/
-        Map<String, String> resultado = new Map ();
+        
+        Map<String, String> resultado = new HashMap<>();
         try {
             resultado = CommandExecutor.obtenerNombreYFromPorId(clientId);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
-        JSONObject objCln = new JSONObject("{}");
-        objCln.put("type", "disconnected");
-        objCln.put("from", "server");
-        objCln.put("usuario", resultado.get("nombre"));
-        objCln.put("from", resultado.get("from"));
-        broadcast(objCln.toString());
-        */
-        // Mostrem per pantalla (servidor) la desconnexió
-        System.out.println("Client disconnected '" + clientId + "'");
-        /* 
-        JSONObject objResponse1 = new JSONObject("{}");
-                objResponse1.put("type", "connected");
-                objResponse1.put("usuario", objRequest.getString("user"));
-                objResponse1.put("from", objRequest.getString("from"));
-                objResponse1.put("id", clientId);
-                broadcast(objResponse1.toString());
-        */
+
+        if (resultado != null) {
+            setConexionesTotales(getConexionesTotales()-1);
+            JSONObject objCln = new JSONObject("{}");
+            objCln.put("type", "disconnected");
+            objCln.put("usuario", resultado.get("nombre"));
+            objCln.put("from", resultado.get("from"));
+            objCln.put("conexiones", getConexionesTotales());
+            broadcast(objCln.toString());
+
+            System.out.println("El Cliente "+resultado.get("nombre") +" de "+resultado.get("from")+" se ha Desconectado");
+
+            CommandExecutor.eliminarUsuarioPorId(clientId);
+        } else {
+            // Manejar el caso donde resultado es null
+            System.out.println("No se pudo obtener información del usuario.");
+        }
+  
     }
 
     @Override
@@ -163,7 +174,11 @@ public void onMessage(WebSocket conn, String message) {
             // El client demana la llista de tots els clients
             
             CommandExecutor.convertirJsonAHashMap();
-            sendList(conn);
+            if (conn.isOpen()) {
+                sendList(conn);
+            } else {
+                System.out.println("no se envio a alex");
+            }
 
         } else if (type.equalsIgnoreCase("image")){
             // PARAMOS LOS PROCESOS EXISTETES
@@ -213,14 +228,19 @@ public void onMessage(WebSocket conn, String message) {
                 conn.send(objResponse.toString());
                 System.out.println("credenciales correctas");
                 CommandExecutor.conectadosJSON(usuario,from,clientId);
+
+                setConexionesTotales(getConexionesTotales()+1);
                 
                 JSONObject objResponse1 = new JSONObject("{}");
                 objResponse1.put("type", "connected");
                 objResponse1.put("usuario", objRequest.getString("user"));
                 objResponse1.put("from", objRequest.getString("from"));
                 objResponse1.put("id", clientId);
+                objResponse1.put("conexiones", getConexionesTotales());
                 broadcast(objResponse1.toString());
                 
+                //elimino al cliente que se conecta
+                //Usuarios.eliminarUsuarioPorNombre(objRequest.getString("user"));
                 
 
             }else if (verificador==false){

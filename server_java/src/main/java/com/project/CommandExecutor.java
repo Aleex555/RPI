@@ -3,6 +3,7 @@ package com.project;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.io.IOException;
@@ -18,6 +19,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 
@@ -95,8 +97,7 @@ public class CommandExecutor {
             if (variable) {
                 procesoImagen.waitFor();
             }
-       
-            System.out.println("INFORMACION ENVIADA CON EXITO");
+
 
            
 
@@ -134,13 +135,7 @@ public class CommandExecutor {
             if (variable) {
                 procesoIp.waitFor();
             }
-            
-
-     
-            
-            System.out.println("SERVER CREADO CON EXITO");
-
-           
+   
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
@@ -182,39 +177,37 @@ public class CommandExecutor {
         procesoMensaje.waitFor();
     }
 
-    //verificador de credenciales
+   
 
     public static boolean verificarCredenciales(String usuario, String contra) {
         try {
-            // Leer el contenido del archivo JSON
+     
             String jsonString = new String(Files.readAllBytes(Paths.get("data/usuarios.json")));
 
-            // Convertir la cadena JSON a un objeto JSON
+       
             JSONObject jsonObject = new JSONObject(jsonString);
 
-            // Obtener la matriz de usuarios
             JSONArray usuariosArray = jsonObject.getJSONArray("usuarios");
 
-            // Iterar sobre los usuarios y verificar las credenciales
+         
             for (int i = 0; i < usuariosArray.length(); i++) {
                 JSONObject usuarioObj = usuariosArray.getJSONObject(i);
 
                 String usuarioGuardado = usuarioObj.getString("usuario");
                 String contraGuardada = usuarioObj.getString("contrasena");
 
-                // Verificar si las credenciales coinciden
+             
                 if (usuario.equals(usuarioGuardado) && contra.equals(contraGuardada)) {
-                    System.out.println("Credenciales válidas. Acceso permitido.");
+                    System.out.println("Se conecto un usuario");
                     return true;
                 }
             }
 
-            // Si el bucle termina sin encontrar coincidencias
-            System.out.println("Credenciales inválidas. Acceso denegado.");
+            
             return false;
 
         } catch (IOException e) {
-            System.err.println("Error al leer el archivo JSON: " + e.getMessage());
+            
         }
         return false;
     }
@@ -242,7 +235,7 @@ public class CommandExecutor {
             // Escribir la nueva imagen en el archivo
             ImageIO.write(image, "jpg", outputFile);
 
-            System.out.println("Imagen guardada con éxito.");
+          
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -279,11 +272,6 @@ public class CommandExecutor {
 
         if (archivoJSON.exists()) {
             boolean eliminado = archivoJSON.delete();
-            if (eliminado) {
-                System.out.println("El archivo conectados.json fue eliminado correctamente.");
-            } else {
-                System.out.println("No se pudo eliminar el archivo conectados.json.");
-            }
         } else {
             System.out.println("El archivo conectados.json no existe en la carpeta data.");
         }
@@ -324,7 +312,7 @@ public class CommandExecutor {
             // Escribir el contenido actualizado en el archivo
             escribirContenido(rutaArchivo, jsonObject.toString(4));
 
-            System.out.println("Usuario agregado al archivo JSON correctamente.");
+          
         } else {
             // Si el archivo no existe, crear uno nuevo con el nuevo usuario dentro de un arreglo "usuarios"
             JSONObject jsonObject = new JSONObject();
@@ -344,7 +332,7 @@ public class CommandExecutor {
 
             try (FileWriter fileWriter = new FileWriter(rutaArchivo)) {
                 fileWriter.write(jsonObject.toString(4));
-                System.out.println("Archivo JSON creado correctamente.");
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -453,4 +441,6 @@ public class CommandExecutor {
 
         return null; // Retornar null si no se encuentra el ID
     }
+
+    
 }
