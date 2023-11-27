@@ -45,7 +45,7 @@ public class CommandExecutor {
         //String workingDirectory = "/home/super";
         // Comando a ejecutar (personalizado según tus necesidades)
 
-        String command = "examples-api-use/scrolling-text-example -y 18 -f ~/dev/bitmap-fonts/bitmap/cherry/cherry-13-b.bdf --led-cols=64 --led-rows=64 --led-slowdown-gpio=4 --led-no-hardware-pulse "+displayText;
+        String command = "examples-api-use/scrolling-text-example -C 159,0,255 -y 18 -f ~/dev/bitmap-fonts/bitmap/cherry/cherry-13-b.bdf --led-cols=64 --led-rows=64 --led-slowdown-gpio=4 --led-no-hardware-pulse "+displayText;
         //String command = "mkdir "+mensaje;
 
         try {
@@ -116,7 +116,7 @@ public class CommandExecutor {
         //String workingDirectory = "/home/super";
         // Comando a ejecutar (personalizado según tus necesidades)
 
-        String command = "examples-api-use/scrolling-text-example -y 18 -f ~/dev/bitmap-fonts/bitmap/cherry/cherry-13-b.bdf --led-cols=64 --led-rows=64 --led-slowdown-gpio=4 --led-no-hardware-pulse "+displayText;
+        String command = "examples-api-use/scrolling-text-example -C 159,0,255 -y 18 -f ~/dev/bitmap-fonts/bitmap/cherry/cherry-13-b.bdf --led-cols=64 --led-rows=64 --led-slowdown-gpio=4 --led-no-hardware-pulse "+displayText;
         //String command = "mkdir "+mensaje;
 
         try {
@@ -147,6 +147,7 @@ public class CommandExecutor {
         procesoImagen.destroy();
         procesoImagen.waitFor();
     }
+    
     public static boolean isProcesoImagenAlive() {
         if (procesoImagen == null) {
             return false;

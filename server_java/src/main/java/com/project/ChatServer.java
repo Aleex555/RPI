@@ -145,6 +145,39 @@ public class ChatServer extends WebSocketServer {
             // Manejar el caso donde resultado es null
             System.out.println("No se pudo obtener información del usuario.");
         }
+
+        String displayIP = "";
+        try {
+            displayIP = Main.getLocalIPAddress();
+        } catch (Exception e) {
+        e.printStackTrace();
+        }
+
+        
+        if(getConexionesTotales()==0){ 
+            boolean isaliveMensaje = CommandExecutor.isProcesoAlive();
+            boolean isliveImagen = CommandExecutor.isProcesoImagenAlive();
+            if (isaliveMensaje){
+                try {
+                    CommandExecutor.detenerProcesoMensaje();
+                } catch (Exception e) {
+            
+                }
+            }
+            if (isliveImagen){
+                try {
+                    CommandExecutor.detenerProcesoImagen();
+                } catch (Exception e) {
+            
+                }
+            }
+            
+
+            commandExecutor.onOpen(displayIP);
+
+        }else {
+            System.out.println("No se pudo obtener información del usuario.");
+        }
   
     }
 
