@@ -1,4 +1,5 @@
 # CRAZY DISPLAY RPI
+By Los Tetuelos
 
 - The main server of the project
 
